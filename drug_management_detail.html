@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>จัดการคลังยา - ระบบ รพ.สต.</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        /* Login Section */
+        .login-section {
+            padding: 50px;
+            text-align: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .login-box {
+            max-width: 400px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.1);
+            padding: 40px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .login-title {
+            font-size: 2em;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            background: rgba(255,255,255,0.9);
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            background: white;
+            transform: scale(1.02);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left h1 {
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+
+        .header-left p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .header-right {
+            text-align: right;
+        }
+
+        .user-info {
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .logout-btn {
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 40px;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 20px rgba(240, 147, 251, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card h3 {
+            font-size: 1em;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+
+        .stat-card .number {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        /* Action Bar */
+        .action-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 300px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px 50px 15px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 25px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #718096;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 0.9em;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+            color: #2d3748;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            color: #2d3748;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            color: #2d3748;
+        }
+
+        /* Drug Table */
+        .table-container {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th,
+        .table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .table th {
+            background: #f7fafc;
+            font-weight: bold;
+            color: #2d3748;
+        }
+
+        .table tr:hover {
+            background: #f7fafc;
+        }
+
+        .stock-status {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .status-high {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .status-medium {
+            background: #fefcbf;
+            color: #744210;
+        }
+
+        .status-low {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .status-out {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+            color: #718096;
+        }
+
+        .request-history {
+            margin-top: 20px;
+        }
+
+        .history-item {
+            background: #f7fafc;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 20px;
+            }
+
+            .action-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-box {
+                min-width: auto;
+            }
+
+            .header {
+                flex-direction: column;
+                text-align: center;
+                gap: 20px;
+            }
+
+            .header-left,
+            .header-right {
+                text-align: center;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .table-container {
+                overflow-x: auto;
+            }
+
+            .table {
+                min-width: 600px;
+            }
+        }
+
+        .app-section {
+            display: none;
+        }
+
+        .app-section.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Section -->
+    <div id="loginSection" class="container">
+        <div class="login-section">
+            <div class="login-box">
+                <h1 class="login-title">🏥 เข้าสู่ระบบคลังยา</h1>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label class="form-label">ชื่อผู้ใช้ / รหัส รพ.สต.</label>
+                        <input type="text" class="form-input" id="username" required placeholder="เช่น admin หรือ rpst001">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">รหัสผ่าน</label>
+                        <input type="password" class="form-input" id="password" required>
+                    </div>
+                    <button type="submit" class="login-btn">🔑 เข้าสู่ระบบ</button>
+                </form>
+                <div style="margin-top: 20px; font-size: 0.9em; opacity: 0.8;">
+                    <p><strong>Admin:</strong> admin / admin123</p>
+                    <p><strong>รพ.สต.:</strong> rpst001 / rpst001</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App Section -->
+    <div id="appSection" class="container app-section">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <h1 id="headerTitle">🏥 จัดการคลังยา</h1>
+                <p id="headerSubtitle">รพ.สต. บ้านดอนยายหอม</p>
+            </div>
+            <div class="header-right">
+                <div class="user-info">
+                    👤 <span id="currentUser">Admin</span>
+                    <span id="userRole" class="stock-status status-high">ผู้ดูแลระบบ</span>
+                </div>
+                <button class="logout-btn" onclick="logout()">🚪 ออกจากระบบ</button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>💊 ยาทั้งหมด</h3>
+                    <div class="number" id="totalDrugs">25</div>
+                    <div>รายการ</div>
+                </div>
+                <div class="stat-card">
+                    <h3>✅ คงเหลือปกติ</h3>
+                    <div class="number" id="normalStock">18</div>
+                    <div>รายการ</div>
+                </div>
+                <div class="stat-card">
+                    <h3>⚠️ ใกล้หมด</h3>
+                    <div class="number" id="lowStock">5</div>
+                    <div>รายการ</div>
+                </div>
+                <div class="stat-card">
+                    <h3>🚫 หมดสต็อก</h3>
+                    <div class="number" id="outOfStock">2</div>
+                    <div>รายการ</div>
+                </div>
+                <div class="stat-card" id="adminOnlyStats" style="display: none;">
+                    <h3>📋 คำขอวันนี้</h3>
+                    <div class="number" id="todayRequests">7</div>
+                    <div>คำขอ</div>
+                </div>
+            </div>
+
+            <!-- Action Bar -->
+            <div class="action-bar">
+                <div class="search-box">
+                    <input type="text" class="search-input" placeholder="🔍 ค้นหายา (ชื่อ, รหัส...)" id="searchInput">
+                    <span class="search-icon">🔍</span>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="openAddDrugModal()">➕ เพิ่มยาใหม่</button>
+                    <button class="btn btn-success" onclick="refreshData()">🔄 รีเฟรช</button>
+                    <button class="btn btn-warning" id="adminOnlyBtn" style="display: none;" onclick="viewAllRequests()">📋 ดูคำขอทั้งหมด</button>
+                </div>
+            </div>
+
+            <!-- Drug Table -->
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>รหัสยา</th>
+                            <th>ชื่อยา</th>
+                            <th>คงเหลือ</th>
+                            <th>หน่วย</th>
+                            <th>จุดสั่งซื้อ</th>
+                            <th>สถานะ</th>
+                            <th>อัพเดทล่าสุด</th>
+                            <th>การจัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="drugTableBody">
+                        <!-- ข้อมูลจะถูกสร้างด้วย JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal เพิ่ม/แก้ไขยา -->
+    <div class="modal" id="drugModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">เพิ่มยาใหม่</h2>
+                <button class="close-btn" onclick="closeDrugModal()">&times;</button>
+            </div>
+            <form id="drugForm">
+                <div class="form-group">
+                    <label class="form-label">รหัสยา</label>
+                    <input type="text" class="form-input" id="drugCode" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">ชื่อยา</label>
+                    <input type="text" class="form-input" id="drugName" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">จำนวนคงเหลือ</label>
+                    <input type="number" class="form-input" id="drugStock" required min="0">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">หน่วยนับ</label>
+                    <select class="form-input" id="drugUnit" required>
+                        <option value="">เลือกหน่วยนับ</option>
+                        <option value="เม็ด">เม็ด</option>
+                        <option value="แคปซูล">แคปซูล</option>
+                        <option value="ขวด">ขวด</option>
+                        <option value="หลอด">หลอด</option>
+                        <option value="กล่อง">กล่อง</option>
+                        <option value="ซอง">ซอง</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">จุดสั่งซื้อ (เมื่อเหลือเท่าไหร่ให้สั่งเพิ่ม)</label>
+                    <input type="number" class="form-input" id="drugReorderPoint" required min="0">
+                </div>
+                <div class="action-buttons">
+                    <button type="submit" class="btn btn-primary">💾 บันทึก</button>
+                    <button type="button" class="btn btn-danger" onclick="closeDrugModal()">❌ ยกเลิก</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal ขอเบิกยา -->
+    <div class="modal" id="requestModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📋 ขอเบิกยา</h2>
+                <button class="close-btn" onclick="closeRequestModal()">&times;</button>
+            </div>
+            <form id="requestForm">
+                <div class="form-group">
+                    <label class="form-label">ยาที่ขอเบิก</label>
+                    <input type="text" class="form-input" id="requestDrugName" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">คงเหลือปัจจุบัน</label>
+                    <input type="text" class="form-input" id="requestCurrentStock" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">จำนวนที่ขอเบิก</label>
+                    <input type="number" class="form-input" id="requestAmount" required min="1">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">เหตุผลการขอเบิก</label>
+                    <textarea class="form-input" id="requestReason" rows="3" placeholder="เช่น ยาใกล้หมด, ผู้ป่วยเพิ่มขึ้น..."></textarea>
+                </div>
+                <div class="action-buttons">
+                    <button type="submit" class="btn btn-primary">📨 ส่งคำขอ</button>
+                    <button type="button" class="btn btn-danger" onclick="closeRequestModal()">❌ ยกเลิก</button>
+                </div>
+            </form>
+            
+            <div class="request-history">
+                <h3>📜 ประวัติการขอเบิกยานี้</h3>
+                <div id="requestHistory">
+                    <!-- ประวัติจะถูกสร้างด้วย JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ระบบ Authentication
+        let currentUser = null;
+        let userRole = null;
+        let userRpstId = null;
+
+        // ข้อมูลผู้ใช้งาน (ในการใช้งานจริงควรเข้ารหัส)
+        const USERS = {
+            'admin': {
+                password: 'ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f', // admin123
+                role: 'admin',
+                name: 'ผู้ดูแลระบบหลัก',
+                rpstId: null
+            },
+            'rpst001': {
+                password: '2e99758548972a8e8822ad47fa1017ff72f06f3ff6a016851f45c398732bc50c', // rpst001
+                role: 'rpst',
+                name: 'รพ.สต. บ้านดอนยายหอม',
+                rpstId: 'rpst001'
+            },
+            'rpst002': {
+                password: '6ca13d52ca70c883e0f0bb101e425a89e8624de51db2d2392593af6a84118090', // rpst002  
+                role: 'rpst',
+                name: 'รพ.สต. บ้านหนองบัว',
+                rpstId: 'rpst002'
+            }
+        };
+
+        // ข้อมูลยาตัวอย่าง
+        let drugsData = [
+            {
+                id: 1,
+                code: 'DRG001',
+                name: 'พาราเซตามอล 500mg',
+                stock: 150,
+                unit: 'เม็ด',
+                reorderPoint: 50,
+                lastUpdate: '2025-06-06 14:30',
+                rpstId: 'rpst001'
+            },
+            {
+                id: 2,
+                code: 'DRG002', 
+                name: 'อมอกซิซิลลิน 250mg',
+                stock: 25,
+                unit: 'แคปซูล',
+                reorderPoint: 30,
+                lastUpdate: '2025-06-06 13:15',
+                rpstId: 'rpst001'
+            },
+            {
+                id: 3,
+                code: 'DRG003',
+                name: 'ยาแก้ไอน้ำแดง',
+                stock: 0,
+                unit: 'ขวด',
+                reorderPoint: 10,
+                lastUpdate: '2025-06-05 16:45',
+                rpstId: 'rpst001'
+            },
+            {
+                id: 4,
+                code: 'DRG004',
+                name: 'วิตามินบี รวม',
+                stock: 200,
+                unit: 'เม็ด',
+                reorderPoint: 100,
+                lastUpdate: '2025-06-06 12:00',
+                rpstId: 'rpst001'
+            },
+            {
+                id: 5,
+                code: 'DRG005',
+                name: 'น้ำเกลือ 0.9%',
+                stock: 15,
+                unit: 'ขวด',
+                reorderPoint: 20,
+                lastUpdate: '2025-06-06 10:30',
+                rpstId: 'rpst001'
+            }
+        ];
+
+        // ข้อมูลคำขอเบิกยา
+        let requestsData = [
+            {
+                id: 1,
+                drugId: 2,
+                drugName: 'อมอกซิซิลลิน 250mg',
+                rpstId: 'rpst001',
+                rpstName: 'รพ.สต. บ้านดอนยายหอม',
+                requestAmount: 50,
+                reason: 'ยาใกล้หมด ผู้ป่วยติดเชื้อเพิ่มขึ้น',
+                status: 'pending',
+                requestDate: '2025-06-06 09:30',
+                currentStock: 25
+            }
+        ];
+
+        // Hash password function
+        async function hashPassword(password) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(password);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        // Login function
+        async function login(username, password) {
+            try {
+                const hashedPassword = await hashPassword(password);
+                const user = USERS[username];
+                
+                if (user && user.password === hashedPassword) {
+                    currentUser = username;
+                    userRole = user.role;
+                    userRpstId = user.rpstId;
+                    
+                    // Hide login, show app
+                    document.getElementById('loginSection').style.display = 'none';
+                    document.getElementById('appSection').classList.add('active');
+                    
+                    // Update UI based on role
+                    updateUIForUserRole();
+                    
+                    // Load data
+                    loadDrugData();
+                    updateStats();
+                    
+                    return true;
+                } else {
+                    alert('❌ ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง');
+                    return false;
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                alert('❌ เกิดข้อผิดพลาดในการเข้าสู่ระบบ');
+                return false;
+            }
+        }
+
+        // Update UI based on user role
+        function updateUIForUserRole() {
+            const user = USERS[currentUser];
+            document.getElementById('currentUser').textContent = user.name;
+            
+            if (userRole === 'admin') {
+                document.getElementById('userRole').textContent = 'ผู้ดูแลระบบ';
+                document.getElementById('userRole').className = 'stock-status status-high';
+                document.getElementById('headerTitle').textContent = '🏥 ระบบจัดการคลังยา (Admin)';
+                document.getElementById('headerSubtitle').textContent = 'ดูข้อมูลทุก รพ.สต.';
+                document.getElementById('adminOnlyStats').style.display = 'block';
+                document.getElementById('adminOnlyBtn').style.display = 'inline-block';
+            } else {
+                document.getElementById('userRole').textContent = 'เจ้าหน้าที่ รพ.สต.';
+                document.getElementById('userRole').className = 'stock-status status-medium';
+                document.getElementById('headerSubtitle').textContent = user.name;
+            }
+        }
+
+        // Load drug data based on user role
+        function loadDrugData() {
+            let filteredDrugs;
+            
+            if (userRole === 'admin') {
+                // Admin เห็นข้อมูลทั้งหมด
+                filteredDrugs = drugsData;
+            } else {
+                // รพ.สต. เห็นเฉพาะข้อมูลของตัวเอง
+                filteredDrugs = drugsData.filter(drug => drug.rpstId === userRpstId);
+            }
+            
+            renderDrugTable(filteredDrugs);
+        }
+
+        // Render drug table
+        function renderDrugTable(drugs) {
+            const tbody = document.getElementById('drugTableBody');
+            tbody.innerHTML = '';
+            
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const filteredDrugs = drugs.filter(drug => 
+                drug.name.toLowerCase().includes(searchTerm) ||
+                drug.code.toLowerCase().includes(searchTerm)
+            );
+            
+            filteredDrugs.forEach(drug => {
+                const status = getStockStatus(drug.stock, drug.reorderPoint);
+                const statusClass = getStatusClass(status);
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${drug.code}</td>
+                    <td>${drug.name}</td>
+                    <td>${drug.stock}</td>
+                    <td>${drug.unit}</td>
+                    <td>${drug.reorderPoint}</td>
+                    <td><span class="stock-status ${statusClass}">${status}</span></td>
+                    <td>${drug.lastUpdate}</td>
+                    <td>
+                        <button class="btn btn-primary" style="font-size: 0.8em; padding: 8px 12px; margin-right: 5px;" onclick="editDrug(${drug.id})">✏️ แก้ไข</button>
+                        <button class="btn btn-warning" style="font-size: 0.8em; padding: 8px 12px;" onclick="requestDrug(${drug.id})">📋 ขอเบิก</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Get stock status
+        function getStockStatus(stock, reorderPoint) {
+            if (stock === 0) return 'หมดสต็อก';
+            if (stock <= reorderPoint) return 'ใกล้หมด';
+            if (stock <= reorderPoint * 2) return 'ปานกลาง';
+            return 'ปกติ';
+        }
+
+        // Get status CSS class
+        function getStatusClass(status) {
+            switch (status) {
+                case 'ปกติ': return 'status-high';
+                case 'ปานกลาง': return 'status-medium';
+                case 'ใกล้หมด': return 'status-low';
+                case 'หมดสต็อก': return 'status-out';
+                default: return 'status-medium';
+            }
+        }
+
+        // Update statistics
+        function updateStats() {
+            let drugs;
+            if (userRole === 'admin') {
+                drugs = drugsData;
+            } else {
+                drugs = drugsData.filter(drug => drug.rpstId === userRpstId);
+            }
+
+            const total = drugs.length;
+            const normal = drugs.filter(drug => drug.stock > drug.reorderPoint * 2).length;
+            const low = drugs.filter(drug => drug.stock > 0 && drug.stock <= drug.reorderPoint).length;
+            const out = drugs.filter(drug => drug.stock === 0).length;
+
+            document.getElementById('totalDrugs').textContent = total;
+            document.getElementById('normalStock').textContent = normal;
+            document.getElementById('lowStock').textContent = low;
+            document.getElementById('outOfStock').textContent = out;
+
+            if (userRole === 'admin') {
+                const todayRequests = requestsData.filter(req => 
+                    req.requestDate.startsWith('2025-06-06')
+                ).length;
+                document.getElementById('todayRequests').textContent = todayRequests;
+            }
+        }
+
+        // Modal functions
+        function openAddDrugModal() {
+            document.getElementById('modalTitle').textContent = 'เพิ่มยาใหม่';
+            document.getElementById('drugForm').reset();
+            document.getElementById('drugModal').style.display = 'block';
+        }
+
+        function closeDrugModal() {
+            document.getElementById('drugModal').style.display = 'none';
+        }
+
+        function editDrug(drugId) {
+            const drug = drugsData.find(d => d.id === drugId);
+            if (drug) {
+                document.getElementById('modalTitle').textContent = 'แก้ไขข้อมูลยา';
+                document.getElementById('drugCode').value = drug.code;
+                document.getElementById('drugName').value = drug.name;
+                document.getElementById('drugStock').value = drug.stock;
+                document.getElementById('drugUnit').value = drug.unit;
+                document.getElementById('drugReorderPoint').value = drug.reorderPoint;
+                
+                // เก็บ ID สำหรับการอัพเดท
+                document.getElementById('drugForm').dataset.editId = drugId;
+                document.getElementById('drugModal').style.display = 'block';
+            }
+        }
+
+        function requestDrug(drugId) {
+            const drug = drugsData.find(d => d.id === drugId);
+            if (drug) {
+                document.getElementById('requestDrugName').value = drug.name;
+                document.getElementById('requestCurrentStock').value = `${drug.stock} ${drug.unit}`;
+                
+                // แสดงประวัติการขอเบิก
+                const history = requestsData.filter(req => req.drugId === drugId);
+                const historyHtml = history.map(req => `
+                    <div class="history-item">
+                        <div><strong>📅 ${req.requestDate}</strong></div>
+                        <div>ขอเบิก: ${req.requestAmount} ${drug.unit}</div>
+                        <div>เหตุผล: ${req.reason}</div>
+                        <div>สถานะ: <span class="stock-status ${req.status === 'approved' ? 'status-high' : req.status === 'pending' ? 'status-medium' : 'status-low'}">${req.status === 'approved' ? '✅ อนุมัติแล้ว' : req.status === 'pending' ? '⏳ รออนุมัติ' : '❌ ไม่อนุมัติ'}</span></div>
+                    </div>
+                `).join('');
+                
+                document.getElementById('requestHistory').innerHTML = history.length > 0 ? historyHtml : '<p>ยังไม่มีประวัติการขอเบิกยานี้</p>';
+                
+                // เก็บ ID สำหรับการส่งคำขอ
+                document.getElementById('requestForm').dataset.drugId = drugId;
+                document.getElementById('requestModal').style.display = 'block';
+            }
+        }
+
+        function closeRequestModal() {
+            document.getElementById('requestModal').style.display = 'none';
+            document.getElementById('requestForm').reset();
+        }
+
+        // Form submissions
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            await login(username, password);
+        });
+
+        document.getElementById('drugForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const editId = this.dataset.editId;
+            const drugData = {
+                code: document.getElementById('drugCode').value,
+                name: document.getElementById('drugName').value,
+                stock: parseInt(document.getElementById('drugStock').value),
+                unit: document.getElementById('drugUnit').value,
+                reorderPoint: parseInt(document.getElementById('drugReorderPoint').value),
+                lastUpdate: new Date().toLocaleString('th-TH'),
+                rpstId: userRpstId || 'rpst001'
+            };
+
+            if (editId) {
+                // แก้ไขยาเดิม
+                const index = drugsData.findIndex(d => d.id == editId);
+                if (index !== -1) {
+                    drugsData[index] = { ...drugsData[index], ...drugData };
+                }
+                delete this.dataset.editId;
+            } else {
+                // เพิ่มยาใหม่
+                const newDrug = {
+                    id: drugsData.length + 1,
+                    ...drugData
+                };
+                drugsData.push(newDrug);
+            }
+
+            loadDrugData();
+            updateStats();
+            closeDrugModal();
+            alert('✅ บันทึกข้อมูลเรียบร้อยแล้ว');
+        });
+
+        document.getElementById('requestForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const drugId = parseInt(this.dataset.drugId);
+            const drug = drugsData.find(d => d.id === drugId);
+            const requestAmount = parseInt(document.getElementById('requestAmount').value);
+            const reason = document.getElementById('requestReason').value;
+
+            const newRequest = {
+                id: requestsData.length + 1,
+                drugId: drugId,
+                drugName: drug.name,
+                rpstId: userRpstId,
+                rpstName: USERS[currentUser].name,
+                requestAmount: requestAmount,
+                reason: reason,
+                status: 'pending',
+                requestDate: new Date().toLocaleString('th-TH'),
+                currentStock: drug.stock
+            };
+
+            requestsData.push(newRequest);
+            closeRequestModal();
+            updateStats();
+            alert('✅ ส่งคำขอเบิกยาเรียบร้อยแล้ว รอการอนุมัติ');
+        });
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', function() {
+            loadDrugData();
+        });
+
+        // Other functions
+        function logout() {
+            currentUser = null;
+            userRole = null;
+            userRpstId = null;
+            
+            document.getElementById('loginSection').style.display = 'block';
+            document.getElementById('appSection').classList.remove('active');
+            document.getElementById('loginForm').reset();
+        }
+
+        function refreshData() {
+            loadDrugData();
+            updateStats();
+            alert('🔄 รีเฟรชข้อมูลเรียบร้อยแล้ว');
+        }
+
+        function viewAllRequests() {
+            if (userRole === 'admin') {
+                // สร้างหน้าต่างแสดงคำขอทั้งหมด
+                let requestsHtml = '<h3>📋 คำขอเบิกยาทั้งหมด</h3>';
+                requestsData.forEach(req => {
+                    requestsHtml += `
+                        <div class="history-item">
+                            <div><strong>🏥 ${req.rpstName}</strong></div>
+                            <div>💊 ${req.drugName}</div>
+                            <div>📊 ขอเบิก: ${req.requestAmount} | คงเหลือ: ${req.currentStock}</div>
+                            <div>📅 ${req.requestDate}</div>
+                            <div>📝 ${req.reason}</div>
+                            <div>สถานะ: <span class="stock-status ${req.status === 'approved' ? 'status-high' : req.status === 'pending' ? 'status-medium' : 'status-low'}">${req.status === 'approved' ? '✅ อนุมัติแล้ว' : req.status === 'pending' ? '⏳ รออนุมัติ' : '❌ ไม่อนุมัติ'}</span></div>
+                            ${req.status === 'pending' ? `<div style="margin-top: 10px;"><button class="btn btn-success" style="font-size: 0.8em; margin-right: 5px;" onclick="approveRequest(${req.id})">✅ อนุมัติ</button><button class="btn btn-danger" style="font-size: 0.8em;" onclick="rejectRequest(${req.id})">❌ ไม่อนุมัติ</button></div>` : ''}
+                        </div>
+                    `;
+                });
+                
+                // แสดงใน modal ใหม่
+                const modal = document.createElement('div');
+                modal.className = 'modal';
+                modal.style.display = 'block';
+                modal.innerHTML = `
+                    <div class="modal-content" style="max-width: 800px;">
+                        <div class="modal-header">
+                            <h2>📋 คำขอเบิกยาทั้งหมด</h2>
+                            <button class="close-btn" onclick="this.closest('.modal').remove()">&times;</button>
+                        </div>
+                        <div style="max-height: 60vh; overflow-y: auto;">
+                            ${requestsHtml}
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+            }
+        }
+
+        function approveRequest(requestId) {
+            const request = requestsData.find(r => r.id === requestId);
+            if (request) {
+                request.status = 'approved';
+                alert('✅ อนุมัติคำขอเรียบร้อยแล้ว');
+                // รีเฟรชการแสดงผล
+                viewAllRequests();
+            }
+        }
+
+        function rejectRequest(requestId) {
+            const request = requestsData.find(r => r.id === requestId);
+            if (request) {
+                request.status = 'rejected';
+                alert('❌ ไม่อนุมัติคำขอ');
+                // รีเฟรชการแสดงผล
+                viewAllRequests();
+            }
+        }
+
+        // Initialize app
+        console.log('🏥 ระบบคลังยา รพ.สต. พร้อมใช้งาน');
+    </script>
+</body>
+</html>
